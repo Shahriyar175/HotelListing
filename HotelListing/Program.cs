@@ -1,3 +1,6 @@
+using HotelListing.Configurations;
+using HotelListing.Data;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
 
@@ -22,6 +25,8 @@ try
     builder.Services.AddSwaggerGen();
     builder.Services.AddSerilog();
     builder.Services.AddCors(p => p.AddPolicy("AllowAll", b => b.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
+    builder.Services.AddDbContext<AppDbContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection")));
+    builder.Services.AddAutoMapper(typeof(MapperInitializer));
 
     var app = builder.Build();
 

@@ -19,8 +19,11 @@ namespace HotelListing.DTOs
     {
         public int Id { get; set; }
 
-        public List<HotelDTO> Hotels { get; set; }
+        public List<HotelSummaryDTO> Hotels { get; set; }
+    }
 
-
+    public class CountrySummaryDTO: CreateCountryDTO
+    {
+        public int Id { get; set; }
     }
 }

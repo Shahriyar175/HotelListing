@@ -1,7 +1,9 @@
+using HotelListing;
 using HotelListing.Configurations;
 using HotelListing.Data;
 using HotelListing.IRepository;
 using HotelListing.Repository;
+using HotelListing.Services;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
@@ -33,6 +35,16 @@ try
     builder.Services.AddAutoMapper(typeof(MapperInitializer));
 
     builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
+    builder.Services.AddScoped<IAuthManager, AuthManager>();
+
+    builder.Services.AddAuthentication();
+    //builder.Services.AddIdentityCore<ApiUser>(u => u.User.RequireUniqueEmail = true)
+    //    .AddRoles<IdentityRole>()
+    //    .AddEntityFrameworkStores<AppDbContext>()
+    //    .AddDefaultTokenProviders();
+
+    builder.Services.ConfigureIdentity();
+    builder.Services.ConfigureJWT(builder.Configuration);
 
     var app = builder.Build();
 
@@ -46,6 +58,8 @@ try
     app.UseSwaggerUI();
 
     app.UseHttpsRedirection();
+
+    app.UseAuthentication();
 
     app.UseAuthorization();
 

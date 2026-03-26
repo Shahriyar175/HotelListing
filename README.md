@@ -25,6 +25,7 @@ The API includes authentication, authorization, logging, database migrations, an
 
 ## 🏗️ Architecture Overview
 
+<pre>
 HotelListing/
 │
 ├── Configurations/        # Entity configurations, Identity, JWT setup
@@ -37,6 +38,7 @@ HotelListing/
 ├── Migrations/            # EF Core migrations
 ├── Program.cs             # Application startup
 └── appsettings.json       # Configuration settings
+</pre>
 
 
 

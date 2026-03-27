@@ -1,9 +1,12 @@
 ﻿using HotelListing.Data;
 using HotelListing.IRepository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq.Expressions;
 using System.Reflection.Metadata.Ecma335;
+using X.PagedList;
+using X.PagedList.Extensions;
 
 namespace HotelListing.Repository
 {
@@ -67,6 +70,21 @@ namespace HotelListing.Repository
             }
 
             return await query.AsNoTracking().ToListAsync();
+        }
+
+        public  IPagedList<T> GetAllPaged(RequestParams requestParams, List<string>? includes = null)
+        {
+            IQueryable<T> query = _db;
+
+            if (includes != null)
+            {
+                foreach (var item in includes)
+                {
+                    query = query.Include(item);
+                }
+            }
+
+            return query.AsNoTracking().ToPagedList(requestParams.PageNumber, requestParams.PageSize);
         }
 
         public async Task InsertAsync(T entity)

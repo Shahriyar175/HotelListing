@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using HotelListing.Data;
 using HotelListing.DTOs;
 using HotelListing.IRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HotelListing.Controllers
@@ -36,7 +38,7 @@ namespace HotelListing.Controllers
             }
         }
 
-        [HttpGet("{id:int}")]
+        [HttpGet("{id:int}", Name = "GetCountry")]
         public async Task<IActionResult> GetCountry(int id)
         {
             try
@@ -50,6 +52,35 @@ namespace HotelListing.Controllers
                 _logger.LogError(ex, $"something went wrong with {nameof(GetCountry)}");
                 return StatusCode(500, "Internal Server Error. Please try later.");
             }
+        }
+
+        [Authorize(Roles ="Admin")]
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> CreateCountry([FromBody] CreateCountryDTO countryDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError($"Invalid POST attempt for {nameof(CreateCountry)}");
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var country = _mapper.Map<Country>(countryDTO);
+                await _unitOfWork.Countries.InsertAsync(country);
+                await _unitOfWork.Save();
+
+                return CreatedAtRoute("GetCountry",new {id = country.Id},country);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Something went wrong in the {nameof(CreateCountry)}");
+                return StatusCode(500); 
+            }
+
         }
     }
 }

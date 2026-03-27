@@ -55,7 +55,7 @@ namespace HotelListing.Controllers
             }
         }
 
-        [Authorize(Roles ="Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -74,12 +74,12 @@ namespace HotelListing.Controllers
                 await _unitOfWork.Countries.InsertAsync(country);
                 await _unitOfWork.Save();
 
-                return CreatedAtRoute("GetCountry",new {id = country.Id},country);
+                return CreatedAtRoute("GetCountry", new { id = country.Id }, country);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Something went wrong in the {nameof(CreateCountry)}");
-                return StatusCode(500); 
+                return StatusCode(500);
             }
 
         }
@@ -105,7 +105,7 @@ namespace HotelListing.Controllers
                     return BadRequest("Submitted data is invalid");
                 }
 
-                _mapper.Map(countryDTO,country);
+                _mapper.Map(countryDTO, country);
                 _unitOfWork.Countries.Update(country);
                 await _unitOfWork.Save();
 
@@ -114,6 +114,39 @@ namespace HotelListing.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Something went wrong in {nameof(UpdateCountry)}");
+                return StatusCode(500);
+            }
+        }
+
+        [Authorize]
+        [HttpDelete("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> DeleteCountry(int id)
+        {
+            if (id < 1)
+            {
+                _logger.LogError($"Invalid DELETE attempt in {DeleteCountry}");
+                return BadRequest();
+            }
+            try
+            {
+                var country = await _unitOfWork.Countries.Get(c => c.Id == id);
+                if (country == null)
+                {
+                    _logger.LogError($"Invalid id for DELETE request in {DeleteCountry}");
+                    return BadRequest("Requested data is invalid");
+                }
+
+                await _unitOfWork.Countries.Delete(id);
+                await _unitOfWork.Save();
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Something went wrong in {nameof(DeleteCountry)}");
                 return StatusCode(500);
             }
         }

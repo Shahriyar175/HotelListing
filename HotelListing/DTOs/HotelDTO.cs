@@ -21,6 +21,10 @@ namespace HotelListing.DTOs
         [Required]
         public int CountryId { get; set; }
     }
+
+    public class UpdateHotelDTO:CreateHotelDTO
+    {
+    }
     
     public class HotelDTO: CreateHotelDTO
     {

@@ -77,12 +77,47 @@ namespace HotelListing.Controllers
                 await _unitOfWork.Hotels.InsertAsync(hotel);
                 await _unitOfWork.Save();
 
-                return CreatedAtRoute("GetHotel", new {id = hotel.Id}, hotel);
+                return CreatedAtRoute("GetHotel", new { id = hotel.Id }, hotel);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Somthing went wrong in the {nameof(CreateHotel)}");
                 return StatusCode(500, "Internal Server Error. please try again later.");
+            }
+        }
+
+        [Authorize]
+        [HttpPut("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UpdateHotel(int id, [FromBody] UpdateHotelDTO hotelDTO )
+        {
+            if (!ModelState.IsValid || id<1 || hotelDTO == null)
+            {
+                _logger.LogError($"Invalid PUT attempt in {nameof(UpdateHotel)}");
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var hotel = await _unitOfWork.Hotels.Get(h => h.Id == id);
+                if (hotel == null)
+                {
+                    _logger.LogError($"Invalid Id in PUT attempt for {nameof(UpdateHotel)}");
+                    return BadRequest("Submitted data is invalid");
+                }
+
+                _mapper.Map(hotelDTO, hotel);
+                _unitOfWork.Hotels.Update(hotel);
+                await _unitOfWork.Save();
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Something went wrong in {nameof(UpdateHotel)}");
+                return StatusCode(500);
             }
         }
     }

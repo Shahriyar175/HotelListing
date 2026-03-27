@@ -14,6 +14,7 @@ namespace HotelListing.DTOs
         public string ShortName { get; set; } = string.Empty;
 
     }
+    public class UpdateCountryDTO: CreateCountryDTO { }
 
     public class CountryDTO: CreateCountryDTO
     {

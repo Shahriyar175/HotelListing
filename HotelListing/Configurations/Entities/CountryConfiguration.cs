@@ -1,7 +1,6 @@
 ﻿using HotelListing.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System.Reflection.Emit;
 
 namespace HotelListing.Configurations.Entities
 {

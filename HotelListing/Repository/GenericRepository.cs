@@ -69,7 +69,7 @@ namespace HotelListing.Repository
             return await query.AsNoTracking().ToListAsync();
         }
 
-        public async Task Insert(T entity)
+        public async Task InsertAsync(T entity)
         {
             await _db.AddAsync(entity);
         }

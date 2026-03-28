@@ -1,3 +1,4 @@
+using AspNetCoreRateLimit;
 using HotelListing;
 using HotelListing.Configurations;
 using HotelListing.Data;
@@ -24,6 +25,8 @@ try
 
     // Add services to the container.
 
+    builder.Services.AddMemoryCache();
+
     builder.Services.AddControllers()
         .AddJsonOptions(op => op.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -38,13 +41,13 @@ try
     builder.Services.AddScoped<IAuthManager, AuthManager>();
 
     builder.Services.AddAuthentication();
-    //builder.Services.AddIdentityCore<ApiUser>(u => u.User.RequireUniqueEmail = true)
-    //    .AddRoles<IdentityRole>()
-    //    .AddEntityFrameworkStores<AppDbContext>()
-    //    .AddDefaultTokenProviders();
 
     builder.Services.ConfigureIdentity();
     builder.Services.ConfigureJWT(builder.Configuration);
+
+    builder.Services.ConfigureRateLimiting();
+    builder.Services.AddInMemoryRateLimiting();
+    builder.Services.AddHttpContextAccessor();
 
     var app = builder.Build();
 
@@ -68,6 +71,8 @@ try
     app.UseSerilogRequestLogging();
 
     app.UseCors("AllowAll");
+
+    app.UseIpRateLimiting();
 
     app.Run();
 }
